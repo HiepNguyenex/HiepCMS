@@ -1,0 +1,66 @@
+﻿@model IEnumerable<CMS.Data.Entities.User>
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Thành viên";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="text-dark">QUẢN LÝ THÀNH VIÊN</h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Thêm thành viên mới
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover shadow-sm border mt-3">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Tên đăng nhập</th>
+                <th>Họ và tên</th>
+                <th>Quyền hạn</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>
+                        <i class="bi bi-person-circle"></i>
+                        <strong>@user.Username</strong>
+                    </td>
+                    <td>@user.FullName</td>
+                    <td>
+                        @if (user.Role == "Admin")
+                        {
+                            <span class="badge bg-danger">Admin</span>
+                        }
+                        else if (user.Role == "Editor")
+                        {
+                            <span class="badge bg-primary">Editor</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@user.Role</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a asp-action="Edit" asp-route-id="@user.Id"
+                               class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-pencil"></i> Sửa
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@user.Id"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('Xóa thành viên @user.Username?')">
+                                <i class="bi bi-trash"></i> Xóa
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,60 @@
+﻿@model CMS.Data.Entities.User
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Sửa thành viên";
+}
+
+<div class="card shadow">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="bi bi-pencil-square"></i> CẬP NHẬT THÔNG TIN THÀNH VIÊN</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+
+            <!-- ⚠️ BẮT BUỘC: giữ Id -->
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="fw-bold">Tên đăng nhập:</label>
+                    <input asp-for="Username" class="form-control" readonly />
+                    <small class="text-muted">
+                        <i class="bi bi-lock"></i> Tên đăng nhập không được phép sửa.
+                    </small>
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold">Mật khẩu mới:</label>
+                    <input type="password" name="NewPassword" class="form-control"
+                           placeholder="Để trống nếu không muốn đổi" />
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i> Để trống = giữ mật khẩu cũ.
+                    </small>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="fw-bold">Họ và Tên:</label>
+                    <input asp-for="FullName" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold">Vai trò:</label>
+                    <select asp-for="Role" class="form-select">
+                        <option value="Admin">Quản trị viên (Admin)</option>
+                        <option value="Editor">Biên tập viên (Editor)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-warning text-dark">
+                    <i class="bi bi-save"></i> Cập nhật
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>

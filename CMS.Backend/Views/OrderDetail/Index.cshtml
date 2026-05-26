@@ -1,0 +1,27 @@
+﻿@model IEnumerable<CMS.Data.Entities.OrderDetail>
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    Layout = "_LayoutAdmin";
+
+}
+<div class="container mt-4">
+    <h2 class="mb-4 text-secondary">📋 CHI TIẾT ĐƠN HÀNG</h2>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr><th>#</th><th>Đơn hàng ID</th><th>Sản phẩm ID</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.OrderId</td>
+                    <td>@item.ProductId</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.UnitPrice.ToString("N0") đ</td>
+                    <td class="fw-bold">@((item.Quantity * item.UnitPrice).ToString("N0")) đ</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

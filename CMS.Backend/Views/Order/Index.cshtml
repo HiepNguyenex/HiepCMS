@@ -1,0 +1,33 @@
+﻿@model IEnumerable<CMS.Data.Entities.Order>
+@{
+    ViewData["Title"] = "Đơn hàng";
+    Layout = "_LayoutAdmin";
+
+}
+<div class="container mt-4">
+    <h2 class="mb-4 text-warning">🧾 DANH SÁCH ĐƠN HÀNG</h2>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr><th>#</th><th>Khách hàng ID</th><th>Ngày đặt</th><th>Trạng thái</th><th>Ghi chú</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var (label, css) = item.Status switch
+                {
+                    0 => ("Chờ xác nhận", "bg-secondary"),
+                    1 => ("Đang xử lý", "bg-warning text-dark"),
+                    2 => ("Đã giao", "bg-success"),
+                    _ => ("Không rõ", "bg-light text-dark")
+                };
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.CustomerId</td>
+                    <td>@item.OrderDate.ToString("dd/MM/yyyy")</td>
+                    <td><span class="badge @css">@label</span></td>
+                    <td>@(item.Notes ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
