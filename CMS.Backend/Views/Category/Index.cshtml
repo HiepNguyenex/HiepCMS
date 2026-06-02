@@ -1,22 +1,35 @@
-﻿@model IEnumerable<CMS.Data.Entities.Category>
+@model IEnumerable<CMS.Data.Entities.Category>
+@{
+    ViewData["Title"] = "Danh mục";
+}
 
-    <h2 class="text-primary">DANH SÁCH DANH MỤC</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Tên danh mục</th>
-                <th>Mô tả</th>
-            </tr>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary">📁 DANH SÁCH DANH MỤC</h2>
+        <a asp-action="Create" class="btn btn-success">+ Thêm mới</a>
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr><th>#</th><th>Tên danh mục</th><th>Mô tả</th><th>Thao tác</th></tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.Name</td>
-                <td>@item.Description</td>
-            </tr>
-        }
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>@item.Description</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id"
+                           class="btn btn-sm btn-warning">Sửa</a>
+                        <form asp-action="Delete" method="post" style="display:inline"
+                              onsubmit="return confirm('Xóa danh mục này?')">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button class="btn btn-sm btn-danger">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
+</div>  
