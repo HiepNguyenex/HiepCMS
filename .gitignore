@@ -360,5 +360,11 @@ MigrationBackup/
 .ionide/
 
 # Fody - auto-generated XML schema
-FodyWeavers.xsdwwwroot/uploads/ 
-wwwroot/uploads/ 
+FodyWeavers.xsd
+
+# Uploads directory
+wwwroot/uploads/
+
+# VS Code settings and workspace files
+.vscode/
+
