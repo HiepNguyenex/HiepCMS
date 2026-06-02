@@ -1,0 +1,31 @@
+@* // sinh vien: nguyen vu hiep // mssv: 2123110161 *@
+@{
+    ViewData["Title"] = "Từ chối truy cập";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card border-0 shadow-lg p-5" style="border-radius: 15px; background-color: #ffffff;">
+                <div class="card-body">
+                    <div class="display-1 text-danger fw-bold mb-4">
+                        <i class="bi bi-shield-slash-fill"></i> 403
+                    </div>
+                    <h2 class="fw-bold mb-3 text-dark">Truy cập bị từ chối</h2>
+                    <p class="text-muted mb-4 fs-5">
+                        Bạn không có quyền truy cập vào chức năng hoặc trang này. Vui lòng liên hệ với quản trị viên hệ thống để biết thêm chi tiết.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="/" class="btn btn-primary px-4 py-2" style="border-radius: 8px;">
+                            <i class="bi bi-house-door-fill me-2"></i> Quay lại trang chủ
+                        </a>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 8px;">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Đăng nhập tài khoản khác
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

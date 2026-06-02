@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using CMS.Data.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize]
     public class PostController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -64,6 +66,12 @@ namespace CMS.Backend.Controllers
         [HttpPost]
         public IActionResult Create(Post model, IFormFile uploadImage)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+                return View(model);
+            }
+
             if (uploadImage != null && uploadImage.Length > 0)
             {
                 string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
@@ -98,6 +106,12 @@ namespace CMS.Backend.Controllers
         [HttpPost]
         public IActionResult Edit(Post model, IFormFile uploadImage)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.CategoryList = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+                return View(model);
+            }
+
             if (uploadImage != null && uploadImage.Length > 0)
             {
                 string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");

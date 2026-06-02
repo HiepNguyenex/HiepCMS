@@ -1,4 +1,4 @@
-﻿@model CMS.Data.Entities.Post
+@model CMS.Data.Entities.Post
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Sửa bài viết";
@@ -21,10 +21,12 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tiêu đề bài viết:</label>
                         <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Nội dung chi tiết:</label>
                         <textarea asp-for="Content" class="form-control" rows="12"></textarea>
+                        <span asp-validation-for="Content" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -35,6 +37,7 @@
                         <select asp-for="CategoryId" class="form-select"
                                 asp-items="ViewBag.CategoryList">
                         </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Ảnh hiện tại:</label><br>

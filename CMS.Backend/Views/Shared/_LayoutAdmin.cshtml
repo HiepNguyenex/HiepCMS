@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -49,6 +49,18 @@
                     <h5 class="text-white mb-0">🛠 HiepCMS Admin</h5>
                     <small class="text-muted">MSSV: 2123110161</small>
                 </div>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="p-3 border-bottom border-secondary text-center">
+                        <div class="d-flex align-items-center justify-content-center mb-1">
+                            <i class="bi bi-person-circle fs-4 me-2 text-primary"></i>
+                            <span class="fw-semibold text-white text-truncate" style="max-width: 130px;">
+                                @User.FindFirst("FullName")?.Value
+                            </span>
+                        </div>
+                        <span class="badge bg-secondary">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</span>
+                    </div>
+                }
                 <div class="mt-2">
                     <a asp-controller="Home" asp-action="Index">
                         <i class="bi bi-speedometer2"></i> Bảng điều khiển
@@ -82,8 +94,14 @@
                     </a>
 
                     <div class="section-title">Hệ thống</div>
-                    <a asp-controller="User" asp-action="Index">
-                        <i class="bi bi-people"></i> Thành viên
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="User" asp-action="Index">
+                            <i class="bi bi-people"></i> Thành viên
+                        </a>
+                    }
+                    <a asp-controller="Account" asp-action="Logout">
+                        <i class="bi bi-box-arrow-right text-danger"></i> Đăng xuất
                     </a>
                 </div>
             </nav>

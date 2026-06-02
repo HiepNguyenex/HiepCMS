@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using CMS.Data.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -38,6 +40,12 @@ namespace CMS.Backend.Controllers
                 return View(model);
             }
 
+            if (!string.IsNullOrEmpty(model.PasswordHash))
+            {
+                var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<User>();
+                model.PasswordHash = hasher.HashPassword(model, model.PasswordHash);
+            }
+
             _context.Users.Add(model);
             _context.SaveChanges();
             return RedirectToAction("Index");
@@ -61,11 +69,16 @@ namespace CMS.Backend.Controllers
 
             if (existingUser == null) return NotFound();
 
-            // Nếu nhập mật khẩu mới thì dùng mới, không thì giữ cũ
+            // Nếu nhập mật khẩu mới thì dùng mới (và băm), không thì giữ cũ
             if (!string.IsNullOrEmpty(NewPassword))
-                model.PasswordHash = NewPassword;
+            {
+                var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<User>();
+                model.PasswordHash = hasher.HashPassword(model, NewPassword);
+            }
             else
+            {
                 model.PasswordHash = existingUser.PasswordHash;
+            }
 
             _context.Users.Update(model);
             _context.SaveChanges();
