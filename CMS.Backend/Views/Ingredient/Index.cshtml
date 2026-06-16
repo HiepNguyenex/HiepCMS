@@ -1,0 +1,61 @@
+@model IEnumerable<CMS.Data.Entities.Ingredient>
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Nốt hương chính";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>DANH SÁCH NỐT HƯƠNG CHÍNH</h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Thêm nốt hương
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Ảnh</th>
+                <th>Tiêu đề nốt hương</th>
+                <th>Mô tả chi tiết</th>
+                <th>Đường dẫn hình ảnh</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>
+                        <img src="@item.ImageUrl"
+                             style="width:60px; height:60px; object-fit:cover; border-radius:6px;"
+                             onerror="this.src='https://via.placeholder.com/60?text=No+Img'"
+                             alt="@item.Title" />
+                    </td>
+                    <td class="fw-bold">@item.Title</td>
+                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        @item.Description
+                    </td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.85rem;" class="text-muted">
+                        @item.ImageUrl
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a asp-action="Edit" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-pencil"></i> Sửa
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa nốt hương này?')">
+                                <i class="bi bi-trash"></i> Xóa
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
