@@ -1,0 +1,79 @@
+@model CMS.Data.Entities.Ingredient
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Thêm nốt hương";
+}
+
+<div class="card shadow">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-plus-circle"></i> THÊM NỐT HƯƠNG MỚI</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div class="row">
+                
+                <!-- CỘT TRÁI -->
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tiêu đề nốt hương:</label>
+                        <input asp-for="Title" class="form-control"
+                               placeholder="Nhập tiêu đề nốt hương (ví dụ: Gỗ Đàn Hương)..." required />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô tả nốt hương:</label>
+                        <textarea asp-for="Description" class="form-control"
+                                  rows="5" placeholder="Mô tả chi tiết hương vị, cảm xúc mang lại..." required></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Upload ảnh từ máy tính:</label>
+                        <input type="file" name="uploadImage" class="form-control"
+                               accept="image/*"
+                               onchange="previewImage(this)" />
+                    </div>
+                    <div class="mb-3" id="previewBox" style="display:none;">
+                        <label class="form-label fw-bold">Xem trước ảnh upload:</label>
+                        <img id="previewImg" src=""
+                             class="img-fluid rounded"
+                             style="max-height:150px; object-fit:cover; width:100%;" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Hoặc nhập liên kết ảnh trực tiếp (URL):</label>
+                        <input asp-for="ImageUrl" class="form-control"
+                               placeholder="https://... hoặc /sandalwood.jpg" />
+                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-cloud-arrow-up"></i> Lưu nốt hương
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('previewBox').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

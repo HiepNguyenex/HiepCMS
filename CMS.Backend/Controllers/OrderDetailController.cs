@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
@@ -14,7 +16,9 @@ namespace CMS.Backend.Controllers
         }
         public IActionResult Index()
         {
-            var list = _context.OrderDetails.ToList();
+            var list = _context.OrderDetails
+                .Include(d => d.Product)
+                .ToList();
             return View(list);
         }
     }

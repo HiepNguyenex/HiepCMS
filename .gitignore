@@ -368,3 +368,6 @@ wwwroot/uploads/
 # VS Code settings and workspace files
 .vscode/
 
+# OpenCode config (contains API keys)
+opencode.json
+
