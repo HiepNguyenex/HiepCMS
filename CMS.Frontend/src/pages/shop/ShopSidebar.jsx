@@ -1,0 +1,89 @@
+import React, { useState, useEffect } from 'react';
+import categoryProductService from '../../services/categoryProductService';
+
+function ShopSidebar({ activeCategoryId, onCategorySelect, priceRange, onPriceRangeChange }) {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const data = await categoryProductService.getAllCategoryProducts();
+        setCategories(data);
+      } catch (err) {
+        console.error("Lỗi khi tải danh mục ở ShopSidebar:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const formatPriceLabel = (value) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+  };
+
+  return (
+    <div className="shop-sidebar p-3 bg-white shadow-sm" style={{ borderRadius: '12px' }}>
+      {/* Category Filter */}
+      <div className="mb-4 text-start">
+        <h5 className="fw-bold font-serif mb-3 pb-2 border-bottom text-charcoal" style={{ fontSize: '1.1rem' }}>
+          DANH MỤC NƯỚC HOA
+        </h5>
+        {loading ? (
+          <div className="text-center py-2">
+            <div className="spinner-border spinner-border-sm text-dark" role="status"></div>
+          </div>
+        ) : (
+          <ul className="list-unstyled">
+            <li className="mb-2">
+              <button
+                className={`btn btn-link p-0 text-decoration-none text-start w-100 ${activeCategoryId === null ? 'fw-bold text-dark' : 'text-secondary'}`}
+                onClick={() => onCategorySelect(null)}
+                style={{ fontSize: '0.9rem' }}
+              >
+                <i className="bi bi-chevron-right me-1" style={{ fontSize: '10px' }}></i> Tất cả
+              </button>
+            </li>
+            {categories.map((cat) => (
+              <li className="mb-2" key={cat.id}>
+                <button
+                  className={`btn btn-link p-0 text-decoration-none text-start w-100 ${activeCategoryId === cat.id ? 'fw-bold text-dark' : 'text-secondary'}`}
+                  onClick={() => onCategorySelect(cat.id)}
+                  style={{ fontSize: '0.9rem' }}
+                >
+                  <i className="bi bi-chevron-right me-1" style={{ fontSize: '10px' }}></i> {cat.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Price Filter */}
+      <div className="mb-2 text-start">
+        <h5 className="fw-bold font-serif mb-3 pb-2 border-bottom text-charcoal" style={{ fontSize: '1.1rem' }}>
+          KHOẢNG GIÁ
+        </h5>
+        <div className="px-2">
+          <input
+            type="range"
+            className="form-range"
+            min="0"
+            max="5000000"
+            step="100000"
+            value={priceRange}
+            onChange={(e) => onPriceRangeChange(parseInt(e.target.value))}
+          />
+          <div className="d-flex justify-content-between mt-2 small text-muted">
+            <span>Dưới:</span>
+            <span className="fw-bold text-charcoal">{formatPriceLabel(priceRange)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ShopSidebar;
