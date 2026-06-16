@@ -1,13 +1,375 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+
+:root {
+  --bg-color: #E5E3DC;
+  --card-bg: #FFFFFF;
+  --text-primary: #1C1E21;
+  --text-secondary: #6A6763;
+  --border-color: rgba(28, 30, 33, 0.08);
+  --font-logo: 'Montserrat', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Montserrat', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-sans);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1, h2, h3, h4, h5, h6, .font-serif {
+  font-family: var(--font-serif);
+}
+
+.text-charcoal {
+  color: var(--text-primary);
+}
+
+.text-muted-warm {
+  color: var(--text-secondary);
+}
+
+.border-charcoal {
+  border-color: var(--border-color) !important;
+}
+
+/* Custom Scrollbar for Luxury Feeling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--text-primary);
+  border: 2px solid var(--bg-color);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
+/* Glassmorphism Sticky Header */
+header.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 1px 0 rgba(28, 30, 33, 0.04);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+}
+
+.header-hidden {
+  transform: translateY(-100%);
+}
+
+.header-visible {
+  transform: translateY(0);
+}
+
+/* Elegant Underline for Navigation Links */
+.nav-link-underline {
+  position: relative;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-primary) !important;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.nav-link-underline::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1.5px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--text-primary);
+  transform-origin: bottom right;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.nav-link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* ==========================================================================
+   Premium Volcanic Banner Hero Section
+   ========================================================================== */
+
+.hero-banner-wrapper {
+  width: 100%;
+  aspect-ratio: 6336 / 2688;
+  min-height: 380px;
+  max-height: 750px;
+  position: relative;
+  background-color: #0b0c0d;
+  overflow: hidden;
+}
+
+.hero-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.9);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Fog dissolve entrance effect */
+.hero-fog-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #E5E3DC;
+  z-index: 4;
+  pointer-events: none;
+  animation: fogDissolve 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes fogDissolve {
+  0% {
+    opacity: 1;
+    backdrop-filter: blur(15px);
+  }
+  100% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    visibility: hidden;
+  }
+}
+
+/* Text reveal slide-up animation with delays */
+.reveal-text-delayed {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: textReveal 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s forwards;
+}
+
+@keyframes textReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Ingredient & Product Cards
+   ========================================================================== */
+
+/* Large Square Ingredient Blocks */
+.ingredient-image-card {
+  aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+  background-color: #121315;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ingredient-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+}
+
+.ingredient-image-card:hover img {
+  transform: scale(1.06);
+  opacity: 0.8;
+}
+
+/* Clean Product Cards */
+.product-card {
+  background-color: var(--card-bg);
+  border: none !important;
+  border-radius: 12px;
+  padding: 1.25rem !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(28, 30, 33, 0.06);
+}
+
+.product-image-container {
+  height: 220px;
+  background-color: #F6F5F2;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  transition: background-color 0.4s ease;
+}
+
+.product-card:hover .product-image-container {
+  background-color: #EFEFEA;
+}
+
+.product-card img {
+  max-height: 85%;
+  max-width: 85%;
+  object-fit: contain;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.product-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Category Filters styling */
+.category-tab {
+  border: 1px solid rgba(28, 30, 33, 0.1) !important;
+  border-radius: 30px !important;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background-color: transparent;
+}
+
+.category-tab:hover, .category-tab.active {
+  border-color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
+  background-color: var(--card-bg) !important;
+}
+
+/* Premium News Cards */
+.news-card {
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+}
+
+.news-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(28, 30, 33, 0.06);
+}
+
+/* Premium Buttons */
+.btn-charcoal {
+  background-color: var(--text-primary) !important;
+  border: 1px solid var(--text-primary) !important;
+  color: #FFFFFF !important;
+  transition: all 0.3s ease !important;
+}
+.btn-charcoal:hover {
+  background-color: #333333 !important;
+  border-color: #333333 !important;
+}
+
+.btn-luxury {
+  border-radius: 30px !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 1.5px !important;
+  padding: 10px 28px !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  text-transform: uppercase;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-luxury-outline {
+  border: 1px solid rgba(28, 30, 33, 0.15) !important;
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+.btn-luxury-outline:hover {
+  border-color: var(--text-primary) !important;
+  background-color: var(--text-primary) !important;
+  color: #FFFFFF !important;
+}
+
+.btn-luxury-solid {
+  background-color: var(--text-primary) !important;
+  border: 1px solid var(--text-primary) !important;
+  color: #FFFFFF !important;
+}
+
+.btn-luxury-solid:hover {
+  background-color: #333333 !important;
+  border-color: #333333 !important;
+  color: #FFFFFF !important;
+}
+
+/* Premium Accent Line */
+.accent-line {
+  height: 1px;
+  background-color: rgba(28, 30, 33, 0.1);
+  width: 60px;
+  margin: 1.5rem auto;
+}
+
+/* Premium Search Input and Button */
+.premium-search-input {
+  border: 1px solid rgba(28, 30, 33, 0.1) !important;
+  border-radius: 30px 0 0 30px !important;
+  background-color: #F6F5F2 !important;
+  padding-left: 1.5rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.premium-search-input:focus {
+  background-color: #FFFFFF !important;
+  border-color: rgba(28, 30, 33, 0.3) !important;
+  box-shadow: 0 0 0 3px rgba(28, 30, 33, 0.03) !important;
+  outline: none;
+}
+
+.premium-search-btn {
+  border-radius: 0 30px 30px 0 !important;
+  background-color: var(--text-primary) !important;
+  border: 1px solid var(--text-primary) !important;
+  color: #FFFFFF !important;
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.premium-search-btn:hover {
+  background-color: #333333 !important;
+  border-color: #333333 !important;
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+  .editorial-title {
+    font-size: 2.5rem;
+  }
 }
