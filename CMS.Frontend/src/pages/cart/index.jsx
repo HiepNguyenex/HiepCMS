@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import CartTable from './CartTable';
+import { toast } from '../../utils/toast';
 
 function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -30,7 +31,7 @@ function Cart() {
     const updated = cartItems.map((item) => {
       if (item.id === id && item.volume === volume) {
         if (newQty > item.stockQuantity) {
-          alert(`Không thể tăng số lượng. Sản phẩm này chỉ còn ${item.stockQuantity} chai trong kho.`);
+          toast.warning(`Không thể tăng số lượng. Sản phẩm này chỉ còn ${item.stockQuantity} chai trong kho.`);
           return item;
         }
         return { ...item, quantity: newQty };

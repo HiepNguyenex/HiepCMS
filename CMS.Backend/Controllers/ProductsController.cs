@@ -18,9 +18,74 @@ namespace CMS.Backend.Controllers
 
         // GET: api/products
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? search, 
+            [FromQuery] int? categoryId,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] bool? inStockOnly,
+            [FromQuery] string? sortBy,
+            [FromQuery] bool? isDescending,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var list = await _context.Products
+            var query = _context.Products.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Name.Contains(search) || (p.Description != null && p.Description.Contains(search)));
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryProductId == categoryId.Value);
+            }
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            if (inStockOnly == true)
+            {
+                query = query.Where(p => p.StockQuantity > 0);
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "name":
+                        query = isDescending == true ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name);
+                        break;
+                    case "price":
+                        query = isDescending == true ? query.OrderByDescending(p => p.Price) : query.OrderBy(p => p.Price);
+                        break;
+                    case "stockquantity":
+                        query = isDescending == true ? query.OrderByDescending(p => p.StockQuantity) : query.OrderBy(p => p.StockQuantity);
+                        break;
+                    case "id":
+                    default:
+                        query = isDescending == true ? query.OrderByDescending(p => p.Id) : query.OrderBy(p => p.Id);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderBy(p => p.Id);
+            }
+
+            if (page.HasValue && pageSize.HasValue && page.Value > 0 && pageSize.Value > 0)
+            {
+                query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            }
+
+            var list = await query
                 .Include(p => p.CategoryProduct)
                 .Select(p => new
                 {

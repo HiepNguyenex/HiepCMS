@@ -1,4 +1,4 @@
-﻿//sinh vien: nguyen vu hiep
+//sinh vien: nguyen vu hiep
 //mssv:2123110161
 //ngay tao:15/5/26
 
@@ -29,8 +29,7 @@ namespace CMS.Data.Entities
 
         public string? Address { get; set; }
 
-        [Required]
-        public string Password { get; set; } // Lưu mật khẩu thô theo yêu cầu tối giản
+        public string? Password { get; set; } // Lưu mật khẩu thô theo yêu cầu tối giản
 
         public virtual ICollection<Order>? Orders { get; set; }
     }

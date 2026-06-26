@@ -1,3 +1,4 @@
+using Stripe;
 using Microsoft.EntityFrameworkCore;    
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -20,6 +21,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
+// Register Email Notification Services
+builder.Services.Configure<CMS.Backend.Services.EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<CMS.Backend.Services.IEmailService, CMS.Backend.Services.EmailService>();
+
 // Register Swagger/OpenAPI services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -34,6 +39,9 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+
+// Configure Stripe global ApiKey
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 var app = builder.Build();
 

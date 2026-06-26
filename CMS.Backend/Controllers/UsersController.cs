@@ -19,9 +19,53 @@ namespace CMS.Backend.Controllers
 
         // GET: api/users
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? search,
+            [FromQuery] string? role,
+            [FromQuery] string? sortBy,
+            [FromQuery] bool? isDescending,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var list = await _context.Users
+            var query = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(u => u.Username.Contains(search) || (u.FullName != null && u.FullName.Contains(search)));
+            }
+
+            if (!string.IsNullOrEmpty(role))
+            {
+                query = query.Where(u => u.Role == role);
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "username":
+                        query = isDescending == true ? query.OrderByDescending(u => u.Username) : query.OrderBy(u => u.Username);
+                        break;
+                    case "fullname":
+                        query = isDescending == true ? query.OrderByDescending(u => u.FullName) : query.OrderBy(u => u.FullName);
+                        break;
+                    case "id":
+                    default:
+                        query = isDescending == true ? query.OrderByDescending(u => u.Id) : query.OrderBy(u => u.Id);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderBy(u => u.Id);
+            }
+
+            if (page.HasValue && pageSize.HasValue && page.Value > 0 && pageSize.Value > 0)
+            {
+                query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            }
+
+            var list = await query
                 .Select(u => new
                 {
                     u.Id,

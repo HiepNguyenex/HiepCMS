@@ -4,6 +4,7 @@ import productService from '../../services/productService';
 import ProductCard from '../../components/ProductCard';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import { toast } from '../../utils/toast';
 
 function ProductDetail() {
   const { id } = useParams();
@@ -130,7 +131,7 @@ function ProductDetail() {
 
   const handleAddToCart = () => {
     if (product.stockQuantity === 0) {
-      alert("Sản phẩm đã hết hàng!");
+      toast.warning("Sản phẩm đã hết hàng!");
       return;
     }
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -138,7 +139,7 @@ function ProductDetail() {
     const calculatedPrice = getDynamicPrice();
     if (existing) {
       if (existing.quantity + quantity > product.stockQuantity) {
-        alert(`Không thể mua thêm. Tổng số lượng trong giỏ hàng vượt quá giới hạn tồn kho (${product.stockQuantity} chai).`);
+        toast.warning(`Không thể mua thêm. Tổng số lượng trong giỏ hàng vượt quá giới hạn tồn kho (${product.stockQuantity} chai).`);
         return;
       }
       existing.quantity += quantity;
@@ -156,7 +157,7 @@ function ProductDetail() {
     }
     localStorage.setItem('cart', JSON.stringify(cart));
     window.dispatchEvent(new Event('cartChange'));
-    alert(`Đã thêm ${quantity} chai [${product.name}] (${selectedVolume}) vào giỏ hàng!`);
+    toast.success(`Đã thêm ${quantity} chai [${product.name}] (${selectedVolume}) vào giỏ hàng!`);
   };
 
   return (

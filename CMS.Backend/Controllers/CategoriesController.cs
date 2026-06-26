@@ -18,9 +18,44 @@ namespace CMS.Backend.Controllers
 
         // GET: api/categories
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? search,
+            [FromQuery] string? sortBy,
+            [FromQuery] bool? isDescending,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var list = await _context.Categories
+            var query = _context.Categories.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(c => c.Name.Contains(search) || (c.Description != null && c.Description.Contains(search)));
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "name":
+                        query = isDescending == true ? query.OrderByDescending(c => c.Name) : query.OrderBy(c => c.Name);
+                        break;
+                    case "id":
+                    default:
+                        query = isDescending == true ? query.OrderByDescending(c => c.Id) : query.OrderBy(c => c.Id);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderBy(c => c.Id);
+            }
+
+            if (page.HasValue && pageSize.HasValue && page.Value > 0 && pageSize.Value > 0)
+            {
+                query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            }
+
+            var list = await query
                 .Select(c => new
                 {
                     c.Id,

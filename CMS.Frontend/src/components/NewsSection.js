@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function NewsSection({ posts }) {
   // Định dạng ngày
@@ -55,13 +56,13 @@ function NewsSection({ posts }) {
                     {post.content}
                   </p>
 
-                  <button
-                    onClick={() => alert(`Chi tiết bài viết: ${post.title}\n\n${post.content}`)}
-                    className="mt-auto btn p-0 text-charcoal fw-bold border-0 bg-transparent text-uppercase"
+                  <Link
+                    to={`/blog/${post.id}`}
+                    className="mt-auto text-charcoal fw-bold text-decoration-none text-uppercase"
                     style={{ fontSize: '0.75rem', letterSpacing: '1px' }}
                   >
                     Đọc bài viết <i className="bi bi-arrow-right ms-1"></i>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

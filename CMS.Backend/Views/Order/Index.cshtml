@@ -9,6 +9,17 @@
         <h2 class="text-warning mb-0">🧾 DANH SÁCH ĐƠN HÀNG</h2>
     </div>
 
+    <!-- BỘ LỌC TRẠNG THÁI -->
+    <div class="mb-4">
+        <div class="btn-group" role="group" aria-label="Order Status Filter">
+            <a href="@Url.Action("Index")" class="btn @(ViewBag.CurrentFilter == -1 ? "btn-dark" : "btn-outline-dark")">Tất cả</a>
+            <a href="@Url.Action("Index", new { status = 0 })" class="btn @(ViewBag.CurrentFilter == 0 ? "btn-warning text-dark" : "btn-outline-warning text-dark")">Chờ xác nhận</a>
+            <a href="@Url.Action("Index", new { status = 1 })" class="btn @(ViewBag.CurrentFilter == 1 ? "btn-primary" : "btn-outline-primary")">Đang xử lý</a>
+            <a href="@Url.Action("Index", new { status = 2 })" class="btn @(ViewBag.CurrentFilter == 2 ? "btn-success" : "btn-outline-success")">Đã giao</a>
+            <a href="@Url.Action("Index", new { status = 3 })" class="btn @(ViewBag.CurrentFilter == 3 ? "btn-danger" : "btn-outline-danger")">Đã hủy</a>
+        </div>
+    </div>
+
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -31,10 +42,11 @@
                     <thead class="table-dark">
                         <tr>
                             <th class="ps-3" style="width: 5%;">#</th>
-                            <th style="width: 20%;">Khách hàng</th>
+                            <th style="width: 15%;">Khách hàng</th>
                             <th style="width: 15%;">Ngày đặt</th>
-                            <th style="width: 25%;">Trạng thái cập nhật</th>
-                            <th style="width: 20%;">Ghi chú</th>
+                            <th style="width: 15%;">Tổng tiền</th>
+                            <th style="width: 20%;">Trạng thái cập nhật</th>
+                            <th style="width: 15%;">Ghi chú</th>
                             <th class="text-center" style="width: 15%;">Hành động</th>
                         </tr>
                     </thead>
@@ -42,7 +54,7 @@
                         @if (!Model.Any())
                         {
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">Chưa có đơn hàng nào trong hệ thống.</td>
+                                <td colspan="7" class="text-center text-muted py-4">Chưa có đơn hàng nào trong hệ thống.</td>
                             </tr>
                         }
                         else
@@ -53,6 +65,9 @@
                                     <td class="ps-3 align-middle">@item.Id</td>
                                     <td class="align-middle fw-semibold">@(item.Customer?.FullName ?? $"Khách hàng #{item.CustomerId}")</td>
                                     <td class="align-middle text-nowrap">@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="align-middle fw-bold text-danger text-nowrap">
+                                        @((item.OrderDetails?.Sum(d => d.Quantity * d.UnitPrice) ?? 0).ToString("N0")) đ
+                                    </td>
                                     <td class="align-middle">
                                         <form asp-action="UpdateStatus" method="post" class="d-inline">
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -60,10 +75,11 @@
                                                 <option value="0" selected="@(item.Status == 0)">Chờ xác nhận</option>
                                                 <option value="1" selected="@(item.Status == 1)">Đang xử lý</option>
                                                 <option value="2" selected="@(item.Status == 2)">Đã giao</option>
+                                                <option value="3" selected="@(item.Status == 3)">Đã hủy</option>
                                             </select>
                                         </form>
                                     </td>
-                                    <td class="align-middle text-muted text-truncate" style="max-width: 180px;">@(item.Notes ?? "-")</td>
+                                    <td class="align-middle text-muted text-truncate" style="max-width: 150px;">@(item.Notes ?? "-")</td>
                                     <td class="align-middle text-center">
                                         <div class="btn-group" role="group">
                                             <button type="button" class="btn btn-sm btn-outline-primary btn-view-details" data-order-id="@item.Id" title="Xem chi tiết">
@@ -135,6 +151,10 @@
                                 statusText = 'Đã giao';
                                 statusBadge = 'bg-success';
                                 break;
+                            case 3:
+                                statusText = 'Đã hủy';
+                                statusBadge = 'bg-danger';
+                                break;
                             default:
                                 statusText = 'Không rõ';
                                 statusBadge = 'bg-light text-dark';
@@ -174,6 +194,7 @@
                                         <th class="text-center">Số lượng</th>
                                         <th class="text-end">Đơn giá</th>
                                         <th class="text-end">Thành tiền</th>
+                                        <th class="text-center">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -189,12 +210,17 @@
                                         <td class="text-center">${item.quantity}</td>
                                         <td class="text-end">${item.unitPrice.toLocaleString('vi-VN')} đ</td>
                                         <td class="text-end fw-bold">${item.totalPrice.toLocaleString('vi-VN')} đ</td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-detail" data-detail-id="${item.id}" data-order-id="${data.id}" title="Xóa sản phẩm này">
+                                                <i class="bi bi-trash"></i> Xóa
+                                            </button>
+                                        </td>
                                     </tr>
                                 `;
                                 totalAmount += item.totalPrice;
                             });
                         } else {
-                            html += `<tr><td colspan="5" class="text-center text-muted">Không có chi tiết sản phẩm.</td></tr>`;
+                            html += `<tr><td colspan="6" class="text-center text-muted">Không có chi tiết sản phẩm.</td></tr>`;
                         }
                         
                         html += `
@@ -203,6 +229,7 @@
                                     <tr>
                                         <th colspan="4" class="text-end py-3">Tổng giá trị đơn hàng:</th>
                                         <th class="text-end text-danger fs-5 py-3">${totalAmount.toLocaleString('vi-VN')} đ</th>
+                                        <th></th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -214,6 +241,31 @@
                         $('#modal-body-content').html('<div class="alert alert-danger"><i class="bi bi-x-circle-fill"></i> Lỗi! Không thể tải dữ liệu chi tiết từ server.</div>');
                     }
                 });
+            });
+
+            // Sự kiện click nút xóa chi tiết sản phẩm lỗi
+            $(document).on('click', '.btn-delete-detail', function() {
+                var detailId = $(this).data('detail-id');
+                var orderId = $(this).data('order-id');
+                
+                if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi đơn hàng? Số lượng tồn kho sản phẩm sẽ được hoàn trả lại.')) {
+                    $.ajax({
+                        url: '/api/orderdetails/' + detailId,
+                        type: 'DELETE',
+                        success: function(response) {
+                            alert('Xóa sản phẩm khỏi đơn hàng thành công!');
+                            // Load lại chi tiết đơn hàng bằng cách kích hoạt click lại nút Xem để cập nhật modal
+                            $('button.btn-view-details[data-order-id="' + orderId + '"]').click();
+                        },
+                        error: function(xhr) {
+                            var errMsg = 'Có lỗi xảy ra khi xóa sản phẩm.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errMsg = xhr.responseJSON.message;
+                            }
+                            alert(errMsg);
+                        }
+                    });
+                }
             });
         });
     </script>

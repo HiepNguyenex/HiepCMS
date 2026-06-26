@@ -7,14 +7,19 @@ import Blog from './pages/blog/index';
 import BlogDetail from './pages/blog-detail/index';
 import Cart from './pages/cart/index';
 import Checkout from './pages/checkout/index';
+import CheckoutSuccess from './pages/checkout-success/index';
 import Login from './pages/login/index';
 import Register from './pages/register/index';
 import About from './pages/about/index';
+import OrderHistory from './pages/order-history/index';
+import Profile from './pages/profile/index';
+import ToastContainer from './components/ToastContainer';
 
 function App() {
   return (
     <Router>
       <div className="d-flex flex-column min-vh-100 bg-light">
+        <ToastContainer />
         <main className="flex-grow-1">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -24,9 +29,12 @@ function App() {
             <Route path="/blog/:id" element={<BlogDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkout-success" element={<CheckoutSuccess />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/about" element={<About />} />
+            <Route path="/order-history" element={<OrderHistory />} />
+            <Route path="/profile" element={<Profile />} />
             
             {/* Lỗi 404 */}
             <Route path="*" element={

@@ -21,6 +21,28 @@ const customerService = {
       console.error("Lỗi API đăng nhập khách hàng:", error);
       throw error;
     }
+  },
+
+  // Lấy thông tin khách hàng bằng ID
+  getCustomerById: async (id) => {
+    try {
+      const response = await axiosClient.get(`/customers/${id}`);
+      return response.data || response;
+    } catch (error) {
+      console.error(`Lỗi API lấy thông tin khách hàng ID ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // Cập nhật thông tin khách hàng
+  updateCustomer: async (id, customerData) => {
+    try {
+      const response = await axiosClient.put(`/customers/${id}`, customerData);
+      return response.data || response;
+    } catch (error) {
+      console.error(`Lỗi API cập nhật thông tin khách hàng ID ${id}:`, error);
+      throw error;
+    }
   }
 };
 

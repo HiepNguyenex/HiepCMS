@@ -1,144 +1,121 @@
-# HiepCMS_Solution
+# 🌟 HiepPerfume.Fashion - Hệ Thống Quản Lý Bán Hàng Nước Hoa & Quản Trị Nội Dung (CMS)
 
-Chào mừng bạn đến với **HiepCMS_Solution**! Đây là đồ án thực hành dành cho môn học **Chuyên đề ASP.NET**. Dự án xây dựng một hệ thống quản trị nội dung (CMS) và quản lý bán hàng toàn diện, kết hợp sức mạnh của **ASP.NET Core 8.0 MVC** ở phần quản trị (Backend) và sự linh hoạt của **React 19** cho trải nghiệm người dùng (Frontend).
-
-Dự án được thực hiện nhằm mục tiêu ứng dụng thực tiễn các kiến thức môn học để mang lại giải pháp quản trị dễ dàng, hiệu năng cao và có cấu trúc rõ ràng.
+Dự án xây dựng giải pháp thương mại điện tử trực tuyến toàn diện dành riêng cho ngành hàng nước hoa cao cấp, kết hợp giữa mô hình quản trị hành chính **ASP.NET Core 8.0 MVC (Backend)** và ứng dụng mua sắm một trang SPA **React 19 (Frontend)**.
 
 ---
 
 ## 🎓 THÔNG TIN SINH VIÊN
+*   **Sinh viên thực hiện:** Nguyễn Vủ Hiệp
+*   **Mã số sinh viên (MSSV):** 2123110161
+*   **Lớp học:** CCQ2311E
+*   **Môn học:** Chuyên đề ASP.NET
+*   **Tên Solution:** HiepCMS_Solution
 
-| Thông tin                       | Chi tiết            |
-| :------------------------------- | :------------------- |
-| **Sinh viên thực hiện** | Nguyễn Vủ Hiệp |
-| **MSSV**                   | 2123110161           |
-| **Lớp**                   | CCQ2311E             |
-| **Môn học**              | Chuyên đề ASP.NET |
-| **Tên Solution**          | HiepCMS_Solution  |
+---
 
-## 🏗️ Kiến trúc & Cấu trúc Thư mục
-
-Giải pháp (Solution) được chia làm 3 phần chính theo mô hình chia sẻ trách nhiệm (Separation of Concerns):
+## 🏗️ Tổng Quan Kiến Trúc Dự Án
+Giải pháp được chia làm 3 phân tầng dự án độc lập, rõ ràng nhằm đảm bảo hiệu năng và tính tái sử dụng mã nguồn:
 
 ```text
 HiepCMS_Solution/
-├── 📂 CMS.Backend/         # Dự án ASP.NET Core 8.0 MVC (Quản trị viên)
-│   ├── 📂 Controllers/     # Điều hướng và xử lý logic nghiệp vụ
-│   ├── 📂 Views/           # Giao diện quản trị (HTML/Razor)
-│   ├── 📂 Models/          # ViewModels và Binding Models
-│   ├── 📂 wwwroot/         # File tĩnh (CSS, JS, Images, v.v.)
-│   └── 📄 Program.cs       # Cấu hình dịch vụ, Middleware & Seed dữ liệu
+├── 📂 CMS.Backend/         # Dự án Web API & Giao diện quản trị MVC (ASP.NET Core 8.0)
+│   ├── 📂 Controllers/     # API Controllers phục vụ React Client & Controllers cho MVC Views
+│   ├── 📂 Views/           # Giao diện quản lý hành chính (Razor HTML) cho admin
+│   └── 📄 Program.cs       # File cấu hình CORS, Auth Cookie, Swagger & Seed Data mẫu
 │
-├── 📂 CMS.Data/            # Dự án Class Library quản lý Cơ sở Dữ liệu
-│   ├── 📂 Entities/        # Các thực thể dữ liệu (Database Models)
-│   ├── 📂 Migrations/      # Lịch sử nâng cấp cấu trúc Database (EF Core)
-│   └── 📄 ApplicationDbContext.cs # Đối tượng kết nối và truy vấn CSDL
+├── 📂 CMS.Data/            # Thư viện Class Library quản lý dữ liệu (C# Entity Framework Core)
+│   ├── 📂 Entities/        # Định nghĩa 9 thực thể C# cấu thành cơ sở dữ liệu quan hệ
+│   └── 📄 ApplicationDbContext.cs # Đối tượng quản lý kết nối và truy vấn CSDL
 │
-└── 📂 CMS.Frontend/        # Ứng dụng khách hàng viết bằng ReactJS
-    ├── 📂 src/             # Source code giao diện React
-    ├── 📂 public/          # File tĩnh (Index.html, Assets, v.v.)
-    └── 📄 package.json     # Quản lý thư viện và script Node.js
+└── 📂 CMS.Frontend/        # Giao diện website mua sắm cho khách hàng (ReactJS 19 SPA)
+    ├── 📂 src/             # Source code React components, pages và axiosClient
+    └── 📄 package.json     # Quản lý dependency và lệnh khởi chạy
 ```
 
 ---
 
-## 🛠️ Công nghệ Sử dụng
+## ⚡ Các Tính Năng Nổi Bật
 
-### 🖥️ Backend (CMS.Backend & CMS.Data)
+### 1. Phân hệ Bán hàng (Frontend - ReactJS)
+*   **Trang chủ (Home):** Banner giới thiệu ấn tượng, hiển thị các sản phẩm bán chạy, danh mục thương hiệu nước hoa và tin tức mùi hương mới nhất.
+*   **Trang cửa hàng (Shop):** Tìm kiếm thời gian thực, lọc sản phẩm theo danh mục và kéo trượt bộ lọc theo khoảng giá.
+*   **Trang chi tiết (ProductDetail):** Hiển thị thông tin chi tiết sản phẩm nước hoa cùng các thành phần mùi hương liên quan (Ingredients) được đề xuất.
+*   **Giỏ hàng & Thanh toán (Cart & Checkout):** Quản lý giỏ hàng trực quan thông qua LocalStorage, cho phép người dùng chọn hình thức thanh toán COD hoặc Stripe Online.
+*   **Tích hợp cổng thanh toán trực tuyến Stripe:** Hỗ trợ thanh toán thẻ tín dụng an toàn thông qua cổng **Stripe Checkout Session** chính chủ.
+*   **Hệ thống Toast Notification cao cấp:** Giao diện Toast được thiết kế theo phong cách **Glassmorphism (backdrop-filter: blur(10px))** sang trọng, thay thế hoàn toàn hộp thoại `alert()` thô sơ của trình duyệt.
+*   **Tự động gửi Email hóa đơn:** Sau khi khách đặt hàng thành công hoặc thanh toán qua Stripe thành công, hệ thống tự động kích hoạt gửi Email hóa đơn xác nhận (bằng HTML) qua Gmail.
+*   **Lịch sử đơn hàng (Order History):** Khách hàng dễ dàng tra cứu danh sách hóa đơn cá nhân kèm theo trạng thái giao hàng chi tiết.
 
-- **Framework chính:** [ASP.NET Core 8.0 MVC](https://learn.microsoft.com/en-us/aspnet/core/mvc/)
-- **ORM (Truy vấn CSDL):** [Entity Framework Core 8.0.8](https://learn.microsoft.com/en-us/ef/core/)
-- **Hệ quản trị CSDL:** Microsoft SQL Server
-- **Xác thực và Phân quyền:** Cookie Authentication (`Microsoft.AspNetCore.Authentication.Cookies`)
-- **Các thực thể chính (Entities):**
-  - `User`: Quản trị viên hệ thống.
-  - `Category` & `Post`: Danh mục và bài viết tin tức.
-  - `CategoryProduct` & `Product`: Danh mục và sản phẩm thương mại điện tử.
-  - `Customer`: Thông tin khách hàng.
-  - `Order` & `OrderDetail`: Đơn hàng và chi tiết sản phẩm trong đơn hàng.
-
-### 🌐 Frontend (CMS.Frontend)
-
-- **Thư viện chính:** [React 19.2.6](https://react.dev/)
-- **Công cụ xây dựng:** `react-scripts` (Create React App)
-- **Ngọn ngữ:** JavaScript (ES6+)
+### 2. Phân hệ Quản trị (Backend CMS - ASP.NET Core 8.0 MVC)
+*   **Đăng nhập bảo mật:** Xác thực người dùng bằng Cookie Authentication và mã hóa mật khẩu bảo mật nâng cao.
+*   **Quản lý nghiệp vụ (CRUD):** CRUD danh mục sản phẩm, sản phẩm nước hoa, danh mục bài viết và bài viết tin tức.
+*   **Hệ thống API nâng cao (Advanced Query Parameters):** Tích hợp tìm kiếm nâng cao (`search`), lọc thông minh (khoảng giá `minPrice`/`maxPrice`, ngày đăng `minDate`/`maxDate`, trạng thái kho `inStockOnly`), sắp xếp linh hoạt (`sortBy` + `isDescending`) và phân trang dữ liệu (`page` + `pageSize`) trên cả 9 API `GET` lấy danh sách.
+*   **Rich Text Editor:** Tích hợp CKEditor viết bài chuẩn SEO, upload hình ảnh trực tiếp lên thư mục máy chủ Backend.
+*   **Quản lý Đơn hàng:** Kiểm tra danh sách hóa đơn từ khách hàng, phê duyệt/hủy tiến trình đơn hàng và tự động cập nhật lại số lượng tồn kho sản phẩm.
 
 ---
 
-## ⚙️ Hướng dẫn Cài đặt & Khởi chạy
-
-Để chạy được toàn bộ dự án trên máy cục bộ, vui lòng làm theo các bước dưới đây:
-
-### 1. Yêu cầu hệ thống
-
-- [SDK .NET 8.0](https://dotnet.microsoft.com/download/dotnet/8.0) trở lên.
-- [Node.js](https://nodejs.org/) (Khuyên dùng bản LTS) & npm.
-- [Microsoft SQL Server](https://www.microsoft.com/sql-server/) (hoặc LocalDB).
+## 💾 Cấu Trúc Cơ Sở Dữ Liệu (9 Thực Thể)
+1.  `User`: Tài khoản Admin / Editor vận hành trang CMS.
+2.  `Category`: Danh mục bài viết tin tức.
+3.  `Post`: Nội dung bài viết tin tức giới thiệu mùi hương.
+4.  `CategoryProduct`: Danh mục sản phẩm nước hoa.
+5.  `Product`: Chi tiết sản phẩm nước hoa cao cấp.
+6.  `Ingredient`: Các thành phần nguyên liệu cấu tạo nước hoa (Đàn Hương, Muối Biển, Hổ Phách,...).
+7.  `Customer`: Tài khoản đăng ký mua sắm của khách hàng.
+8.  `Order`: Hóa đơn mua hàng khách hàng đặt.
+9.  `OrderDetail`: Chi tiết số lượng và đơn giá của từng mặt hàng trong hóa đơn.
 
 ---
 
-### 2. Cấu hình & Chạy Backend (`CMS.Backend`)
+## 🚀 CÁCH KHỞI CHẠY NHANH NHẤT (QUICK START)
 
-#### **Bước A: Cấu hình Connection String**
+Thực hiện lần lượt 3 bước sau để chạy toàn bộ hệ thống trên máy cục bộ:
 
-Mở file `CMS.Backend/appsettings.json` và điều chỉnh chuỗi kết nối SQL Server của bạn:
-
+### Bước 1: Cấu hình Connection String & API Keys
+Mở file [appsettings.json](file:///d:/Bai%20Tap/CMS/HiepCMS_Solution/CMS.Backend/appsettings.json) trong `CMS.Backend` và thay đổi thông tin kết nối CSDL, SMTP Email và Stripe Keys của bạn:
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=YOUR_SERVER;Database=HiepCMS_DB;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+    "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=HiepCMS_DB;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+  },
+  "EmailSettings": {
+    "MailServer": "smtp.gmail.com",
+    "MailPort": 587,
+    "SenderName": "HiepCMS Perfume Shop",
+    "SenderEmail": "nguyenvuhiep401@gmail.com",
+    "Password": "YOUR_GMAIL_APP_PASSWORD"
+  },
+  "Stripe": {
+    "SecretKey": "sk_test_...",
+    "PublishableKey": "pk_test_..."
   }
 }
 ```
 
-#### **Bước B: Cập nhật Database (Migration)**
-
-Mở terminal tại thư mục dự án và chạy các lệnh sau để khởi tạo cơ sở dữ liệu:
-
+### Bước 2: Cập nhật CSDL & Tự Động Seed Dữ Liệu Mẫu
+Mở terminal tại thư mục gốc dự án và chạy câu lệnh cập nhật Database (hệ thống sẽ tự động khởi tạo cơ sở dữ liệu và seed sẵn sản phẩm mẫu, danh mục, bài viết, thành phần mùi hương vào SQL Server nếu CSDL trống):
 ```powershell
-# Di chuyển đến thư mục backend
-cd CMS.Backend
-
-# Áp dụng Migration vào SQL Server
-dotnet ef database update --project ../CMS.Data/CMS.Data.csproj
+dotnet ef database update --project CMS.Data --startup-project CMS.Backend
 ```
 
-_(Hoặc trong Visual Studio, mở **Package Manager Console**, chọn Default Project là `CMS.Data` và chạy lệnh `Update-Database`)_
+### Bước 3: Khởi chạy song song Backend & Frontend
 
-> [!NOTE]
-> Hệ thống có sẵn tính năng **Tự động Seed dữ liệu mẫu** trong `Program.cs`. Trong lần chạy đầu tiên, hệ thống sẽ tự động thêm các danh mục sản phẩm mẫu, danh sách sản phẩm (iPhone, MacBook, Dell XPS, v.v. kèm ảnh thực tế từ Unsplash), khách hàng, đơn hàng mẫu vào Database nếu chưa có dữ liệu.
+1.  **Chạy Backend Web API (ASP.NET Core):**
+    ```powershell
+    dotnet run --project CMS.Backend
+    ```
+    *   *Địa chỉ API & MVC Admin:* [http://localhost:5288](http://localhost:5288) hoặc [https://localhost:7005](https://localhost:7005)
+    *   *Tài liệu API Swagger:* [http://localhost:5288/swagger](http://localhost:5288/swagger)
+    *   *Tài khoản Admin mặc định:* `admin` / mật khẩu `123456`
 
-#### **Bước C: Khởi chạy dự án Backend**
-
-Chạy lệnh sau tại thư mục `CMS.Backend`:
-
-```powershell
-dotnet run
-```
-
-Ứng dụng sẽ chạy ở địa chỉ mặc định (thường là `https://localhost:7198` hoặc `http://localhost:5198`). Bạn có thể mở trình duyệt và truy cập để vào giao diện quản trị.
+2.  **Chạy Frontend Client (ReactJS):**
+    Mở một cửa sổ Terminal mới, di chuyển vào thư mục Frontend và khởi chạy:
+    ```powershell
+    cd CMS.Frontend
+    npm start
+    ```
+    *   *Địa chỉ giao diện Client:* [http://localhost:3000](http://localhost:3000)
 
 ---
-
-### 3. Cài đặt & Khởi chạy Frontend (`CMS.Frontend`)
-
-#### **Bước A: Cài đặt thư viện**
-
-Mở terminal mới tại thư mục `CMS.Frontend` và cài đặt các phụ thuộc Node.js:
-
-```powershell
-cd CMS.Frontend
-npm install
-```
-
-#### **Bước B: Khởi chạy ứng dụng**
-
-Chạy ứng dụng React ở môi trường lập trình local:
-
-```powershell
-npm start
-```
-
-Ứng dụng sẽ tự động mở trên trình duyệt tại địa chỉ `http://localhost:3000`.
-
----
+*Chúc bạn thực hành tốt đồ án môn học!*

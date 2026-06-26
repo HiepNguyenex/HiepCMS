@@ -97,6 +97,14 @@ function Header() {
             <>
               <span className="text-charcoal fw-semibold"><i className="bi bi-person-check me-1"></i>Chào, {customer.fullName || customer.FullName}</span>
               <span className="text-muted">|</span>
+              <Link to="/profile" className="text-decoration-none text-charcoal fw-semibold">
+                <i className="bi bi-person-gear me-1"></i>Tài khoản
+              </Link>
+              <span className="text-muted">|</span>
+              <Link to="/order-history" className="text-decoration-none text-charcoal fw-semibold">
+                <i className="bi bi-receipt me-1"></i>Đơn hàng
+              </Link>
+              <span className="text-muted">|</span>
               <button onClick={handleLogout} className="btn btn-link text-decoration-none text-charcoal p-0 m-0 fw-semibold align-baseline" style={{ fontSize: 'inherit' }}>
                 <i className="bi bi-box-arrow-right me-1"></i>Đăng xuất
               </button>

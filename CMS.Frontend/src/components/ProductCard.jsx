@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from '../utils/toast';
 
 function ProductCard({ item }) {
   const formatCurrency = (value) => {
@@ -11,7 +12,7 @@ function ProductCard({ item }) {
 
   const handleAddToCart = () => {
     if (item.stockQuantity === 0) {
-      alert("Sản phẩm đã hết hàng!");
+      toast.warning("Sản phẩm đã hết hàng!");
       return;
     }
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -19,7 +20,7 @@ function ProductCard({ item }) {
     const existing = cart.find(x => x.id === item.id && x.volume === defaultVolume);
     if (existing) {
       if (existing.quantity >= item.stockQuantity) {
-        alert(`Không thể mua thêm. Số lượng trong giỏ hàng đã đạt giới hạn tồn kho (${item.stockQuantity} chai).`);
+        toast.warning(`Không thể mua thêm. Số lượng trong giỏ hàng đã đạt giới hạn tồn kho (${item.stockQuantity} chai).`);
         return;
       }
       existing.quantity += 1;
@@ -37,7 +38,7 @@ function ProductCard({ item }) {
     }
     localStorage.setItem('cart', JSON.stringify(cart));
     window.dispatchEvent(new Event('cartChange'));
-    alert(`Đã thêm nước hoa [${item.name}] vào giỏ hàng!`);
+    toast.success(`Đã thêm nước hoa [${item.name}] vào giỏ hàng!`);
   };
 
   return (

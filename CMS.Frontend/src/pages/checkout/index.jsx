@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import orderService from '../../services/orderService';
+import paymentService from '../../services/paymentService';
 
 function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [customer, setCustomer] = useState(null);
   const [notes, setNotes] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   
   // Shipping info states (pre-filled from customer)
   const [shippingInfo, setShippingInfo] = useState({
@@ -96,6 +98,18 @@ function Checkout() {
       };
 
       const response = await orderService.createOrder(payload);
+      
+      if (paymentMethod === 'stripe') {
+        const orderId = response.id || response.Id;
+        const session = await paymentService.createCheckoutSession(orderId);
+        if (session && session.url) {
+          window.location.href = session.url;
+          return;
+        } else {
+          throw new Error("Không thể khởi tạo kết nối thanh toán Stripe.");
+        }
+      }
+
       setCreatedOrder(response);
       setOrderSuccess(true);
       
@@ -255,6 +269,50 @@ function Checkout() {
                       onChange={(e) => setNotes(e.target.value)}
                     ></textarea>
                   </div>
+                </div>
+              </div>
+
+              {/* PHƯƠNG THỨC THANH TOÁN */}
+              <div className="card border-0 shadow-sm p-4 bg-white mt-4" style={{ borderRadius: '12px' }}>
+                <h5 className="fw-bold font-serif mb-4 pb-2 border-bottom text-charcoal" style={{ fontSize: '1.1rem' }}>
+                  PHƯƠNG THỨC THANH TOÁN
+                </h5>
+                <div className="d-flex flex-column gap-3">
+                  <label className="border p-3 rounded d-flex align-items-center justify-content-between cursor-pointer" style={{ cursor: 'pointer', borderColor: paymentMethod === 'cod' ? '#000' : '#ddd', backgroundColor: paymentMethod === 'cod' ? '#fcfcfa' : 'transparent' }}>
+                    <div className="d-flex align-items-center gap-3">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="cod"
+                        checked={paymentMethod === 'cod'}
+                        onChange={() => setPaymentMethod('cod')}
+                        style={{ accentColor: '#000', width: '18px', height: '18px' }}
+                      />
+                      <div>
+                        <strong className="d-block small text-charcoal mb-1">Thanh toán khi nhận hàng (COD)</strong>
+                        <span className="text-muted-warm" style={{ fontSize: '0.75rem' }}>Thanh toán bằng tiền mặt khi shipper giao hàng tận tay.</span>
+                      </div>
+                    </div>
+                    <i className="bi bi-cash-stack fs-4 text-secondary"></i>
+                  </label>
+
+                  <label className="border p-3 rounded d-flex align-items-center justify-content-between cursor-pointer" style={{ cursor: 'pointer', borderColor: paymentMethod === 'stripe' ? '#000' : '#ddd', backgroundColor: paymentMethod === 'stripe' ? '#fcfcfa' : 'transparent' }}>
+                    <div className="d-flex align-items-center gap-3">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="stripe"
+                        checked={paymentMethod === 'stripe'}
+                        onChange={() => setPaymentMethod('stripe')}
+                        style={{ accentColor: '#000', width: '18px', height: '18px' }}
+                      />
+                      <div>
+                        <strong className="d-block small text-charcoal mb-1">Thẻ tín dụng / Online qua Stripe</strong>
+                        <span className="text-muted-warm" style={{ fontSize: '0.75rem' }}>Thanh toán an toàn qua cổng Stripe quốc tế (Sandbox).</span>
+                      </div>
+                    </div>
+                    <i className="bi bi-credit-card-2-back fs-4 text-secondary"></i>
+                  </label>
                 </div>
               </div>
             </div>

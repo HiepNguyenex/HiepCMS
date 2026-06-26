@@ -1,9 +1,9 @@
 import axiosClient from '../api/axiosClient';
 
 const productService = {
-  getAllProducts: async () => {
+  getAllProducts: async (params = {}) => {
     try {
-      const response = await axiosClient.get('/products');
+      const response = await axiosClient.get('/products', { params });
       return response.data || response;
     } catch (error) {
       console.error("Lỗi API getAllProducts:", error);

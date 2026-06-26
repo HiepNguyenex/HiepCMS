@@ -19,9 +19,50 @@ namespace CMS.Backend.Controllers
 
         // GET: api/customers
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? search,
+            [FromQuery] string? sortBy,
+            [FromQuery] bool? isDescending,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var list = await _context.Customers
+            var query = _context.Customers.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(c => c.FullName.Contains(search) || 
+                                         c.Email.Contains(search) || 
+                                         (c.Phone != null && c.Phone.Contains(search)) || 
+                                         (c.Address != null && c.Address.Contains(search)));
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "fullname":
+                        query = isDescending == true ? query.OrderByDescending(c => c.FullName) : query.OrderBy(c => c.FullName);
+                        break;
+                    case "email":
+                        query = isDescending == true ? query.OrderByDescending(c => c.Email) : query.OrderBy(c => c.Email);
+                        break;
+                    case "id":
+                    default:
+                        query = isDescending == true ? query.OrderByDescending(c => c.Id) : query.OrderBy(c => c.Id);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderBy(c => c.Id);
+            }
+
+            if (page.HasValue && pageSize.HasValue && page.Value > 0 && pageSize.Value > 0)
+            {
+                query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            }
+
+            var list = await query
                 .Select(c => new
                 {
                     c.Id,
@@ -60,6 +101,11 @@ namespace CMS.Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Customer customer)
         {
+            if (string.IsNullOrEmpty(customer.Password))
+            {
+                ModelState.AddModelError("Password", "Mật khẩu là bắt buộc khi đăng ký.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -88,25 +134,15 @@ namespace CMS.Backend.Controllers
             return CreatedAtAction(nameof(GetById), new { id = customer.Id }, result);
         }
 
-        // PUT: api/customers/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Customer customer)
         {
+            Console.WriteLine($"[DEBUG PUT] id={id}, customer.Id={customer.Id}, customer.FullName={customer.FullName ?? "null"}, customer.Email={customer.Email ?? "null"}, customer.Password={customer.Password ?? "null"}");
+
             if (id != customer.Id)
             {
+                Console.WriteLine($"[DEBUG PUT] ID mismatch: url_id={id}, body_id={customer.Id}");
                 return BadRequest(new { message = "ID không trùng khớp" });
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            // Kiểm tra trùng lặp email với khách hàng khác
-            var emailExists = await _context.Customers.AnyAsync(c => c.Email == customer.Email && c.Id != id);
-            if (emailExists)
-            {
-                return BadRequest(new { message = "Email này đã được sử dụng bởi khách hàng khác" });
             }
 
             // Tìm thực thể cũ để giữ mật khẩu nếu password trong body bị rỗng/null
@@ -119,6 +155,23 @@ namespace CMS.Backend.Controllers
             if (string.IsNullOrEmpty(customer.Password))
             {
                 customer.Password = existingCustomer.Password;
+                ModelState.Remove("Password");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = string.Join("; ", ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .Select(x => x.ErrorMessage));
+                Console.WriteLine("VALIDATION ERRORS: " + errors);
+                return BadRequest(ModelState);
+            }
+
+            // Kiểm tra trùng lặp email với khách hàng khác
+            var emailExists = await _context.Customers.AnyAsync(c => c.Email == customer.Email && c.Id != id);
+            if (emailExists)
+            {
+                return BadRequest(new { message = "Email này đã được sử dụng bởi khách hàng khác" });
             }
 
             _context.Entry(customer).State = EntityState.Modified;

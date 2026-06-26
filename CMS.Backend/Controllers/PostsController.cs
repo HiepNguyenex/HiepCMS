@@ -18,11 +18,66 @@ namespace CMS.Backend.Controllers
 
         // 1. GET: api/posts - Lấy toàn bộ danh sách bài viết gọt tỉa
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? search, 
+            [FromQuery] int? categoryId,
+            [FromQuery] DateTime? minDate,
+            [FromQuery] DateTime? maxDate,
+            [FromQuery] string? sortBy,
+            [FromQuery] bool? isDescending,
+            [FromQuery] int? page,
+            [FromQuery] int? pageSize)
         {
-            var posts = await _context.Posts
+            var query = _context.Posts.AsQueryable();
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Title.Contains(search) || p.Content.Contains(search));
+            }
+
+            if (minDate.HasValue)
+            {
+                query = query.Where(p => p.CreatedDate >= minDate.Value);
+            }
+
+            if (maxDate.HasValue)
+            {
+                query = query.Where(p => p.CreatedDate <= maxDate.Value);
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy.ToLower())
+                {
+                    case "createddate":
+                        query = isDescending == true ? query.OrderByDescending(p => p.CreatedDate) : query.OrderBy(p => p.CreatedDate);
+                        break;
+                    case "title":
+                        query = isDescending == true ? query.OrderByDescending(p => p.Title) : query.OrderBy(p => p.Title);
+                        break;
+                    case "id":
+                    default:
+                        query = isDescending == true ? query.OrderByDescending(p => p.Id) : query.OrderBy(p => p.Id);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderByDescending(p => p.Id);
+            }
+
+            if (page.HasValue && pageSize.HasValue && page.Value > 0 && pageSize.Value > 0)
+            {
+                query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+            }
+
+            var posts = await query
                 .Include(p => p.Category)
-                .OrderByDescending(p => p.Id)
                 .Select(p => new
                 {
                     p.Id,
