@@ -4,6 +4,8 @@ import HeroBanner from './HeroBanner';
 import IngredientSection from '../../components/IngredientSection';
 import CategoryMenu from './CategoryMenu';
 import ProductGrid from './ProductGrid';
+import NewArrivals from './NewArrivals';
+import Bestsellers from './Bestsellers';
 import LatestBlog from './LatestBlog';
 import Footer from '../../components/Footer';
 
@@ -29,6 +31,12 @@ function Home() {
 
       {/* TẦNG 4: Lưới sản phẩm */}
       <ProductGrid selectedCategoryId={selectedCategoryId} />
+
+      {/* TẦNG 4.1: Sản phẩm mới nhất */}
+      <NewArrivals />
+
+      {/* TẦNG 4.2: Sản phẩm bán chạy */}
+      <Bestsellers />
 
       {/* TẦNG 5: Khối bài viết tin tức */}
       <LatestBlog />

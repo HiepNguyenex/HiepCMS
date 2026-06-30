@@ -12,13 +12,29 @@ const customerService = {
     }
   },
 
-  // Đăng nhập khách hàng
+  // Đăng nhập khách hàng (Sử dụng mật khẩu băm thông qua AuthController)
   login: async (email, password) => {
     try {
-      const response = await axiosClient.post('/customers/login', { email, password });
-      return response.data || response;
+      const response = await axiosClient.post('/auth/customer-login', { email, password });
+      const customerData = response.data?.customer || response.customer;
+      const token = response.data?.token || response.token;
+      if (customerData && token) {
+        customerData.token = token; // Đính kèm token vào đối tượng customer
+      }
+      return customerData || response.data || response;
     } catch (error) {
       console.error("Lỗi API đăng nhập khách hàng:", error);
+      throw error;
+    }
+  },
+
+  // Quên mật khẩu khách hàng
+  forgotPassword: async (email) => {
+    try {
+      const response = await axiosClient.post('/auth/forgot-password', { email });
+      return response.data || response;
+    } catch (error) {
+      console.error("Lỗi API quên mật khẩu khách hàng:", error);
       throw error;
     }
   },

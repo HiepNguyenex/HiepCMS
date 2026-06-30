@@ -107,10 +107,9 @@ function BlogDetail() {
             {/* Post Content */}
             <div 
               className="post-content text-charcoal" 
-              style={{ fontSize: '1.05rem', lineHeight: '1.8', whiteSpace: 'pre-line' }}
-            >
-              {post.content}
-            </div>
+              style={{ fontSize: '1.05rem', lineHeight: '1.8' }}
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
 
             {/* Bottom Actions */}
             <div className="border-top mt-5 pt-4 d-flex justify-content-between">

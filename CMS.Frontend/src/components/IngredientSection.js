@@ -36,10 +36,12 @@ function IngredientSection() {
     fetchIngredients();
   }, []);
 
+  const IMAGE_BASE_URL = process.env.REACT_APP_IMAGE_BASE_URL || 'http://localhost:5288';
+
   const getImageUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    if (url.startsWith('/uploads/')) return `http://localhost:5288${url}`;
+    if (url.startsWith('/uploads/')) return `${IMAGE_BASE_URL}${url}`;
     return url;
   };
 

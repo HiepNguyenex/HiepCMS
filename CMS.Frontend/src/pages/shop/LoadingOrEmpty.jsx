@@ -27,8 +27,8 @@ function LoadingOrEmpty({ loading, error, isEmpty }) {
           className="mb-4"
           style={{ width: '80px', opacity: 0.4 }}
         />
-        <h4 className="fw-bold font-serif text-secondary mb-2">KHÔNG TÌM THẤY SẢN PHẨM</h4>
-        <p className="text-muted small">Hãy thử tìm kiếm với từ khóa khác hoặc điều chỉnh lại bộ lọc.</p>
+        <h4 className="fw-bold font-serif text-secondary mb-2">KHÔNG TÌM THẤY KẾT QUẢ</h4>
+        <p className="text-muted small">Không tìm thấy sản phẩm nào phù hợp với tiêu chí của bạn.</p>
       </div>
     );
   }

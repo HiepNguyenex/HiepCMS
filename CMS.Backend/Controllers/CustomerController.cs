@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
 using CMS.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
-using System.Linq;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace CMS.Backend.Controllers
 {
@@ -42,6 +43,13 @@ namespace CMS.Backend.Controllers
 
             if (ModelState.IsValid)
             {
+                // Hash password trước khi lưu
+                if (!string.IsNullOrEmpty(model.Password))
+                {
+                    var hasher = new PasswordHasher<Customer>();
+                    model.Password = hasher.HashPassword(model, model.Password);
+                }
+
                 _context.Customers.Add(model);
                 _context.SaveChanges();
                 TempData["Success"] = "Thêm khách hàng thành công!";
@@ -72,6 +80,21 @@ namespace CMS.Backend.Controllers
 
             if (ModelState.IsValid)
             {
+                // Lấy thực thể cũ để kiểm tra mật khẩu
+                var existing = _context.Customers.AsNoTracking().FirstOrDefault(c => c.Id == model.Id);
+
+                if (string.IsNullOrEmpty(model.Password))
+                {
+                    // Giữ nguyên mật khẩu cũ nếu không nhập mới
+                    model.Password = existing?.Password;
+                }
+                else
+                {
+                    // Hash mật khẩu mới
+                    var hasher = new PasswordHasher<Customer>();
+                    model.Password = hasher.HashPassword(model, model.Password);
+                }
+
                 _context.Customers.Update(model);
                 _context.SaveChanges();
                 TempData["Success"] = "Cập nhật thông tin khách hàng thành công!";

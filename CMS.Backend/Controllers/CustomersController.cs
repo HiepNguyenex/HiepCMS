@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using CMS.Data.Entities;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace CMS.Backend.Controllers
 {
@@ -118,6 +119,10 @@ namespace CMS.Backend.Controllers
                 return BadRequest(new { message = "Email này đã được đăng ký trong hệ thống" });
             }
 
+            // Băm mật khẩu khách hàng bằng PasswordHasher
+            var hasher = new PasswordHasher<Customer>();
+            customer.Password = hasher.HashPassword(customer, customer.Password);
+
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
@@ -156,6 +161,12 @@ namespace CMS.Backend.Controllers
             {
                 customer.Password = existingCustomer.Password;
                 ModelState.Remove("Password");
+            }
+            else if (customer.Password != existingCustomer.Password)
+            {
+                // Mật khẩu mới được nhập -> băm mật khẩu
+                var hasher = new PasswordHasher<Customer>();
+                customer.Password = hasher.HashPassword(customer, customer.Password);
             }
 
             if (!ModelState.IsValid)
@@ -217,11 +228,28 @@ namespace CMS.Backend.Controllers
             }
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Email == request.Email && c.Password == request.Password);
+                .FirstOrDefaultAsync(c => c.Email == request.Email);
 
             if (customer == null)
             {
                 return BadRequest(new { message = "Email hoặc mật khẩu không chính xác." });
+            }
+
+            // Xác thực mật khẩu bằng PasswordHasher
+            var hasher = new PasswordHasher<Customer>();
+            var verificationResult = hasher.VerifyHashedPassword(customer, customer.Password ?? "", request.Password);
+
+            if (verificationResult == PasswordVerificationResult.Failed)
+            {
+                return BadRequest(new { message = "Email hoặc mật khẩu không chính xác." });
+            }
+
+            // Nếu hash cũ (SuccessRehashNeeded), cập nhật hash mới
+            if (verificationResult == PasswordVerificationResult.SuccessRehashNeeded)
+            {
+                customer.Password = hasher.HashPassword(customer, request.Password);
+                _context.Customers.Update(customer);
+                await _context.SaveChangesAsync();
             }
 
             var result = new

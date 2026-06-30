@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CMS.Data.Entities.Product>
+@model IEnumerable<CMS.Data.Entities.Product>
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Sản phẩm";
@@ -76,3 +76,31 @@
         </tbody>
     </table>
 </div>
+
+@* ───────── PAGINATION ───────── *@
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+}
+@if (totalPages > 1)
+{
+    <nav aria-label="Phân trang sản phẩm">
+        <ul class="pagination justify-content-center mt-3">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="?page=@(currentPage - 1)&pageSize=10" tabindex="-1">‹</a>
+            </li>
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="?page=@i&pageSize=10">@i</a>
+                </li>
+            }
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" href="?page=@(currentPage + 1)&pageSize=10">›</a>
+            </li>
+        </ul>
+        <p class="text-center text-muted small mb-0">
+            Trang @currentPage / @totalPages (tổng số @ViewBag.TotalItems sản phẩm)
+        </p>
+    </nav>
+}

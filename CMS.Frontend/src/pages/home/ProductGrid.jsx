@@ -12,7 +12,14 @@ function ProductGrid({ selectedCategoryId }) {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const data = await productService.getAllProducts();
+        const params = {};
+        if (selectedCategoryId !== null) {
+          params.categoryId = selectedCategoryId;
+        }
+        if (searchTerm.trim() !== '') {
+          params.search = searchTerm;
+        }
+        const data = await productService.getAllProducts(params);
         setProducts(data);
         setError(null);
       } catch (err) {
@@ -23,7 +30,9 @@ function ProductGrid({ selectedCategoryId }) {
       }
     };
     fetchProducts();
+  }, [selectedCategoryId, searchTerm]);
 
+  useEffect(() => {
     const handleSearch = (e) => {
       setSearchTerm(e.detail || '');
     };
@@ -32,13 +41,6 @@ function ProductGrid({ selectedCategoryId }) {
       window.removeEventListener('searchPerfume', handleSearch);
     };
   }, []);
-
-  const filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategoryId === null || product.categoryProductId === selectedCategoryId;
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
 
   return (
     <section id="store-products" className="py-5 bg-white text-start">
@@ -49,7 +51,7 @@ function ProductGrid({ selectedCategoryId }) {
           </span>
           <h2 className="fw-bold font-serif" style={{ fontSize: '2.2rem' }}>SẢN PHẨM NỔI BẬT</h2>
           <p className="text-muted-warm small mt-1">
-            Hiển thị [{filteredProducts.length}] sản phẩm nước hoa cao cấp
+            Hiển thị [{products.length}] sản phẩm nước hoa cao cấp
           </p>
           <div className="accent-line"></div>
         </div>
@@ -65,14 +67,20 @@ function ProductGrid({ selectedCategoryId }) {
           <div className="alert alert-warning text-center my-4" role="alert">
             <i className="bi bi-exclamation-triangle me-2"></i> {error}
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="text-center py-5">
-            <i className="bi bi-search fs-1 text-muted-warm d-block mb-3"></i>
-            <p className="text-muted-warm text-center">Không tìm thấy chai nước hoa nào phù hợp.</p>
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3067/3067416.png"
+              alt="Không tìm thấy sản phẩm"
+              className="mb-4"
+              style={{ width: '80px', opacity: 0.4 }}
+            />
+            <h4 className="fw-bold font-serif text-secondary mb-2">KHÔNG TÌM THẤY KẾT QUẢ</h4>
+            <p className="text-muted-warm text-center">Không tìm thấy sản phẩm nào phù hợp với tiêu chí của bạn.</p>
           </div>
         ) : (
           <div className="row g-4">
-            {filteredProducts.map((product) => (
+            {products.map((product) => (
               <div key={product.id} className="col-lg-3 col-md-4 col-sm-6">
                 <ProductCard item={product} />
               </div>

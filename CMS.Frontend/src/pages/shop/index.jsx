@@ -14,7 +14,8 @@ function Shop() {
 
   // Filter and sort states
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [priceRange, setPriceRange] = useState(5000000);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(5000000);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('default');
 
@@ -22,7 +23,20 @@ function Shop() {
     const fetchAllProducts = async () => {
       try {
         setLoading(true);
-        const data = await productService.getAllProducts();
+        const params = {};
+        if (selectedCategoryId !== null) {
+          params.categoryId = selectedCategoryId;
+        }
+        if (minPrice > 0) {
+          params.minPrice = minPrice;
+        }
+        if (maxPrice > 0 && maxPrice < 5000000) {
+          params.maxPrice = maxPrice;
+        }
+        if (searchTerm.trim() !== '') {
+          params.search = searchTerm;
+        }
+        const data = await productService.getAllProducts(params);
         setProducts(data);
         setError(null);
       } catch (err) {
@@ -33,19 +47,9 @@ function Shop() {
       }
     };
     fetchAllProducts();
-  }, []);
+  }, [selectedCategoryId, minPrice, maxPrice, searchTerm]);
 
-  // Filter and sort computation
-  const filteredProducts = products.filter((prod) => {
-    const matchesCategory = selectedCategoryId === null || prod.categoryProductId === selectedCategoryId;
-    const matchesPrice = prod.price <= priceRange;
-    const matchesSearch = prod.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          (prod.description && prod.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    return matchesCategory && matchesPrice && matchesSearch;
-  });
-
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  const sortedProducts = [...products].sort((a, b) => {
     if (sortBy === 'priceAsc') return a.price - b.price;
     if (sortBy === 'priceDesc') return b.price - a.price;
     return 0; // Default sorting by backend ID order
@@ -76,8 +80,10 @@ function Shop() {
             <ShopSidebar
               activeCategoryId={selectedCategoryId}
               onCategorySelect={setSelectedCategoryId}
-              priceRange={priceRange}
-              onPriceRangeChange={setPriceRange}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              onMinPriceChange={setMinPrice}
+              onMaxPriceChange={setMaxPrice}
             />
           </div>
 

@@ -1,40 +1,389 @@
-﻿@model IEnumerable<CMS.Data.Entities.Post>
+@model IEnumerable<CMS.Data.Entities.Post>
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Bảng điều khiển - HiepCMS Admin";
     Layout = "_LayoutAdmin";
-
 }
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4 text-danger">TIN TỨC MỚI NHẤT</h2>
-    <div class="row">
-        @foreach (var item in Model)
-        {
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100">
-                    <img src="@item.ImageUrl"
-                         class="card-img-top"
-                         style="height:180px; object-fit:cover;"
-                         onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'"
-                         alt="Thumbnail">
-                    <div class="card-body">
-                        <span class="badge bg-primary mb-2">
-                            @(item.Category?.Name ?? "Chưa phân loại")
-                        </span>
-                        <h5 class="card-title mt-1">@item.Title</h5>
-                        <p class="card-text text-truncate text-muted small">
-                            @item.Content
-                        </p>
-                        <a href="/Post/Details/@item.Id"
-                           class="btn btn-outline-danger btn-sm">
-                            Đọc tiếp →
-                        </a>
+@functions {
+    public string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "U";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+        return (parts[0][0].ToString() + parts[parts.Length - 1][0].ToString()).ToUpper();
+    }
+
+    public string GetAvatarBg(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "#ef4444";
+        // Return a deterministic pastel color based on name hash code
+        string[] colors = { "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#06b6d4", "#14b8a6" };
+        int index = Math.Abs(name.GetHashCode()) % colors.Length;
+        return colors[index];
+    }
+}
+
+<style>
+    .stat-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none !important;
+        border-radius: 20px !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03) !important;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 35px rgba(0, 0, 0, 0.12) !important;
+    }
+    .stat-icon-wrapper {
+        background-color: #ffffff !important;
+        width: 54px;
+        height: 54px;
+        min-width: 54px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    }
+    .stat-card:hover .stat-icon-wrapper {
+        transform: scale(1.1) rotate(5deg);
+    }
+    .dashboard-container {
+        background-color: #F8F9FC;
+        min-height: 100vh;
+    }
+    .section-card {
+        border: none !important;
+        border-radius: 20px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02) !important;
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.01) !important;
+    }
+    .custom-table th {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.72rem;
+        letter-spacing: 0.8px;
+        color: #64748b;
+        border-bottom: 2px solid #e2e8f0;
+        padding: 16px 12px;
+    }
+    .custom-table td {
+        padding: 16px 12px !important;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.88rem;
+        color: #334155;
+        font-weight: 500;
+    }
+    .custom-table tr {
+        transition: all 0.2s ease;
+    }
+    .custom-table tr:hover {
+        background-color: #f8fafc;
+    }
+    .status-pill-modern {
+        padding: 6px 14px;
+        font-weight: 700;
+        font-size: 0.72rem;
+        border-radius: 50px;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+    }
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .pill-pending {
+        background-color: #f1f5f9;
+        color: #64748b;
+        border-color: #e2e8f0;
+    }
+    .pill-pending .status-dot {
+        background-color: #64748b;
+    }
+    .pill-processing {
+        background-color: #fef3c7;
+        color: #d97706;
+        border-color: #fde68a;
+    }
+    .pill-processing .status-dot {
+        background-color: #d97706;
+        animation: pulse-orange 1.5s infinite;
+    }
+    .pill-completed {
+        background-color: #dcfce7;
+        color: #15803d;
+        border-color: #bbf7d0;
+    }
+    .pill-completed .status-dot {
+        background-color: #15803d;
+    }
+    .pill-cancelled {
+        background-color: #fee2e2;
+        color: #b91c1c;
+        border-color: #fecaca;
+    }
+    .pill-cancelled .status-dot {
+        background-color: #b91c1c;
+    }
+
+    @@keyframes pulse-orange {
+        0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.7);
+        }
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 5px rgba(217, 119, 6, 0);
+        }
+        100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(217, 119, 6, 0);
+        }
+    }
+
+    .avatar-circle-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.8rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .news-row {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        padding: 10px;
+        border: 1px solid transparent;
+    }
+    .news-row:hover {
+        background-color: #f8fafc;
+        border-color: #f1f5f9;
+        transform: translateX(4px);
+    }
+    .news-img {
+        transition: all 0.3s ease;
+    }
+    .news-row:hover .news-img {
+        transform: scale(1.05);
+    }
+    .btn-pill {
+        border-radius: 50px !important;
+        padding: 8px 20px !important;
+        font-weight: 600 !important;
+        font-size: 0.82rem !important;
+        letter-spacing: 0.3px;
+    }
+</style>
+
+<div class="dashboard-container py-4 px-4">
+    <!-- Tiêu đề Dashboard -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-extrabold text-dark mb-1 font-serif">BẢNG ĐIỀU KHIỂN QUẢN TRỊ</h2>
+            <p class="text-muted small mb-0">Theo dõi hoạt động kinh doanh và bài viết tin tức</p>
+        </div>
+        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10 p-2 fs-6 rounded-3 shadow-none">
+            <i class="bi bi-clock-history me-1"></i> Cập nhật: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+        </span>
+    </div>
+
+    <!-- Hàng Stats Card -->
+    <div class="row g-4 mb-5">
+        <!-- Tổng sản phẩm -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card text-white p-3 h-100" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-white-50 text-uppercase small mb-1 fw-bold" style="letter-spacing: 0.8px; font-size: 0.75rem;">Tổng sản phẩm</p>
+                        <h2 class="fw-extrabold mb-0" style="font-size: 2rem;">@ViewBag.TotalProducts</h2>
                     </div>
-                    <div class="card-footer text-muted small">
-                        📅 @item.CreatedDate.ToString("dd/MM/yyyy")
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-box-seam fs-3" style="color: #3b82f6;"></i>
                     </div>
                 </div>
+                <div class="mt-4 pt-2 border-top border-white border-opacity-10">
+                    <a href="/Product" class="text-white text-decoration-none fw-semibold small d-flex align-items-center justify-content-between">
+                        <span>Quản lý sản phẩm</span> <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-        }
+        </div>
+
+        <!-- Khách hàng -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card text-white p-3 h-100" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-white-50 text-uppercase small mb-1 fw-bold" style="letter-spacing: 0.8px; font-size: 0.75rem;">Khách hàng</p>
+                        <h2 class="fw-extrabold mb-0" style="font-size: 2rem;">@ViewBag.TotalCustomers</h2>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-people fs-3" style="color: #10b981;"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-2 border-top border-white border-opacity-10">
+                    <a href="/Customer" class="text-white text-decoration-none fw-semibold small d-flex align-items-center justify-content-between">
+                        <span>Danh sách khách</span> <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đơn hàng -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card text-white p-3 h-100" style="background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-white-50 text-uppercase small mb-1 fw-bold" style="letter-spacing: 0.8px; font-size: 0.75rem;">Đơn hàng</p>
+                        <h2 class="fw-extrabold mb-0" style="font-size: 2rem;">@ViewBag.TotalOrders</h2>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-cart3 fs-3" style="color: #f59e0b;"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-2 border-top border-white border-opacity-10">
+                    <a href="/Order" class="text-white text-decoration-none fw-semibold small d-flex align-items-center justify-content-between">
+                        <span>Xử lý đơn hàng</span> <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doanh thu -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card text-white p-3 h-100" style="background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-white-50 text-uppercase small mb-1 fw-bold" style="letter-spacing: 0.8px; font-size: 0.75rem;">Tổng doanh thu</p>
+                        <h2 class="fw-extrabold mb-0" style="font-size: 1.8rem;">@ViewBag.TotalRevenue.ToString("N0")đ</h2>
+                    </div>
+                    <div class="stat-icon-wrapper">
+                        <i class="bi bi-cash-stack fs-3" style="color: #f43f5e;"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-2 border-top border-white border-opacity-10 text-white-50 small d-flex align-items-center justify-content-between">
+                    <span>Cập nhật thời gian thực</span> <i class="bi bi-check-circle-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hàng nội dung chi tiết -->
+    <div class="row g-4">
+        <!-- Đơn hàng gần đây -->
+        <div class="col-12 col-lg-8">
+            <div class="card section-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-extrabold mb-0 text-dark font-serif" style="font-size: 1.2rem; letter-spacing: 0.5px;">ĐƠN HÀNG GẦN ĐÂY</h4>
+                    <a href="/Order" class="btn btn-outline-primary btn-pill">Tất cả đơn hàng</a>
+                </div>
+                <div class="table-responsive" style="box-shadow: none; border: none;">
+                    <table class="table custom-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Mã ĐH</th>
+                                <th>Ngày đặt</th>
+                                <th>Khách hàng</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.RecentOrders != null)
+                            {
+                                foreach (var order in ViewBag.RecentOrders)
+                                {
+                                    <tr>
+                                        <td><strong class="text-dark">#@order.Id</strong></td>
+                                        <td class="text-muted">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar-circle-sm" style="background-color: @GetAvatarBg(order.CustomerName);">
+                                                    @GetInitials(order.CustomerName)
+                                                </div>
+                                                <span class="text-dark fw-semibold">@order.CustomerName</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-danger fw-bold fs-6">@order.TotalAmount.ToString("N0") đ</td>
+                                        <td>
+                                            @if (order.Status == 0)
+                                            {
+                                                <span class="status-pill-modern pill-pending"><span class="status-dot"></span>Chờ thanh toán</span>
+                                            }
+                                            else if (order.Status == 1)
+                                            {
+                                                <span class="status-pill-modern pill-processing"><span class="status-dot"></span>Đang xử lý</span>
+                                            }
+                                            else if (order.Status == 2)
+                                            {
+                                                <span class="status-pill-modern pill-completed"><span class="status-dot"></span>Hoàn thành</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-pill-modern pill-cancelled"><span class="status-dot"></span>Đã hủy</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-5">
+                                        <i class="bi bi-inbox fs-2 d-block mb-2"></i> Chưa có đơn hàng nào
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tin tức mới nhất -->
+        <div class="col-12 col-lg-4">
+            <div class="card section-card p-4 h-100">
+                <h4 class="fw-extrabold mb-4 text-dark font-serif" style="font-size: 1.2rem; letter-spacing: 0.5px;">TIN TỨC MỚI NHẤT</h4>
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var item in Model)
+                    {
+                        <a href="/Post" class="text-decoration-none text-dark news-row d-flex gap-3 align-items-center">
+                            <div class="rounded-3 overflow-hidden shadow-sm" style="width: 80px; height: 60px; min-width: 80px;">
+                                <img src="@item.ImageUrl" 
+                                     class="news-img" 
+                                     style="width: 100%; height: 100%; object-fit: cover;" 
+                                     onerror="this.src='https://via.placeholder.com/80x60?text=No+Image'" 
+                                     alt="Post Thumbnail" />
+                            </div>
+                            <div class="flex-grow-1" style="min-width: 0;">
+                                <span class="badge bg-light text-dark border mb-1" style="font-size: 9px; font-weight: 600;">
+                                    @(item.Category?.Name ?? "Chưa phân loại")
+                                </span>
+                                <h6 class="mb-0 text-truncate fw-bold text-dark" style="font-size: 0.88rem; line-height: 1.3;">@item.Title</h6>
+                                <small class="text-muted" style="font-size: 10px;">📅 @item.CreatedDate.ToString("dd/MM/yyyy")</small>
+                            </div>
+                        </a>
+                    }
+                </div>
+                <div class="mt-auto pt-4">
+                    <a href="/Post" class="btn btn-outline-danger btn-pill w-100">Quản lý bài viết</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

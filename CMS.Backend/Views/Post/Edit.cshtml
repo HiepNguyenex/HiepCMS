@@ -77,9 +77,45 @@
 @section Scripts {
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script>
+        class MyUploadAdapter {
+            constructor(loader) {
+                this.loader = loader;
+            }
+            upload() {
+                return this.loader.file
+                    .then(file => new Promise((resolve, reject) => {
+                        const data = new FormData();
+                        data.append('upload', file);
+                        fetch('/Post/UploadImage', {
+                            method: 'POST',
+                            body: data
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Upload failed');
+                            return response.json();
+                        })
+                        .then(result => {
+                            resolve({
+                                default: result.url
+                            });
+                        })
+                        .catch(err => reject(err));
+                    }));
+            }
+            abort() {}
+        }
+
+        function MyCustomUploadAdapterPlugin(editor) {
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                return new MyUploadAdapter(loader);
+            };
+        }
+
         // Kích hoạt CKEditor cho ô nội dung
-        ClassicEditor.create(document.querySelector('#Content'))
-            .catch(error => console.error(error));
+        ClassicEditor.create(document.querySelector('#Content'), {
+            extraPlugins: [MyCustomUploadAdapterPlugin],
+        })
+        .catch(error => console.error(error));
 
         // Xem trước ảnh mới trước khi upload
         function previewImage(input) {

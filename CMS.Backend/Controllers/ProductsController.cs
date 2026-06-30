@@ -102,6 +102,56 @@ namespace CMS.Backend.Controllers
             return Ok(list);
         }
 
+        // GET: api/products/bestsellers
+        [HttpGet("bestsellers")]
+        public async Task<IActionResult> GetBestsellers()
+        {
+            var bestsellers = await _context.OrderDetails
+                .GroupBy(d => d.ProductId)
+                .OrderByDescending(g => g.Sum(d => d.Quantity))
+                .Select(g => g.Key)
+                .Take(3)
+                .ToListAsync();
+
+            var products = await _context.Products
+                .Where(p => bestsellers.Contains(p.Id))
+                .Include(p => p.CategoryProduct)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Description,
+                    p.Price,
+                    p.StockQuantity,
+                    p.ImageUrl,
+                    p.CategoryProductId,
+                    CategoryProductName = p.CategoryProduct != null ? p.CategoryProduct.Name : null
+                })
+                .ToListAsync();
+
+            if (products.Count < 3)
+            {
+                products = await _context.Products
+                    .OrderBy(p => p.Price)
+                    .Take(3)
+                    .Include(p => p.CategoryProduct)
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.Name,
+                        p.Description,
+                        p.Price,
+                        p.StockQuantity,
+                        p.ImageUrl,
+                        p.CategoryProductId,
+                        CategoryProductName = p.CategoryProduct != null ? p.CategoryProduct.Name : null
+                    })
+                    .ToListAsync();
+            }
+
+            return Ok(products);
+        }
+
         // GET: api/products/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import categoryProductService from '../../services/categoryProductService';
 
-function ShopSidebar({ activeCategoryId, onCategorySelect, priceRange, onPriceRangeChange }) {
+function ShopSidebar({ activeCategoryId, onCategorySelect, minPrice, maxPrice, onMinPriceChange, onMaxPriceChange }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -66,19 +66,50 @@ function ShopSidebar({ activeCategoryId, onCategorySelect, priceRange, onPriceRa
         <h5 className="fw-bold font-serif mb-3 pb-2 border-bottom text-charcoal" style={{ fontSize: '1.1rem' }}>
           KHOẢNG GIÁ
         </h5>
-        <div className="px-2">
-          <input
-            type="range"
-            className="form-range"
-            min="0"
-            max="5000000"
-            step="100000"
-            value={priceRange}
-            onChange={(e) => onPriceRangeChange(parseInt(e.target.value))}
-          />
-          <div className="d-flex justify-content-between mt-2 small text-muted">
-            <span>Dưới:</span>
-            <span className="fw-bold text-charcoal">{formatPriceLabel(priceRange)}</span>
+        
+        {/* Min & Max Inputs */}
+        <div className="d-flex gap-2 mb-3">
+          <div className="flex-fill">
+            <label className="small text-muted mb-1 fw-semibold">Từ</label>
+            <input
+              type="number"
+              className="form-control form-control-sm"
+              min="0"
+              max={maxPrice}
+              step="100000"
+              placeholder="0"
+              value={minPrice}
+              onChange={(e) => {
+                const val = parseInt(e.target.value) || 0;
+                if (val <= maxPrice) onMinPriceChange(val);
+              }}
+              style={{ borderRadius: '8px', fontSize: '0.85rem' }}
+            />
+          </div>
+          <div className="flex-fill">
+            <label className="small text-muted mb-1 fw-semibold">Đến</label>
+            <input
+              type="number"
+              className="form-control form-control-sm"
+              min={minPrice}
+              max="10000000"
+              step="100000"
+              placeholder="5.000.000"
+              value={maxPrice}
+              onChange={(e) => {
+                const val = parseInt(e.target.value) || 0;
+                if (val >= minPrice) onMaxPriceChange(val);
+              }}
+              style={{ borderRadius: '8px', fontSize: '0.85rem' }}
+            />
+          </div>
+        </div>
+
+        {/* Range Slider */}
+        <div className="px-1">
+          <div className="d-flex justify-content-between small text-muted mb-1">
+            <span>{formatPriceLabel(minPrice)}</span>
+            <span className="fw-bold text-charcoal">{formatPriceLabel(maxPrice)}</span>
           </div>
         </div>
       </div>

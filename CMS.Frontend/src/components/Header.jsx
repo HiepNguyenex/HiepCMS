@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Header() {
@@ -71,8 +71,38 @@ function Header() {
     navigate('/');
   };
 
+  // Debounce search ref
+  const searchTimerRef = useRef(null);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    // Clear previous timer
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+
+    // Debounce: dispatch event + navigate after 500ms of no typing
+    if (value.trim()) {
+      searchTimerRef.current = setTimeout(() => {
+        const event = new CustomEvent('searchPerfume', { detail: value });
+        window.dispatchEvent(event);
+        navigate('/');
+      }, 500);
+    } else {
+      // Nếu xóa hết từ khóa, dispatch event rỗng để reset
+      const event = new CustomEvent('searchPerfume', { detail: '' });
+      window.dispatchEvent(event);
+    }
+  };
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    // Cancel debounce timer nếu user submit form trực tiếp
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
     const event = new CustomEvent('searchPerfume', { detail: searchTerm });
     window.dispatchEvent(event);
     navigate('/');
@@ -136,7 +166,7 @@ function Header() {
               className="form-control premium-search-input"
               placeholder="Tìm kiếm mùi hương, thương hiệu nước hoa..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               style={{ fontSize: '0.85rem' }}
             />
             <button className="btn premium-search-btn py-2 px-4" type="submit">

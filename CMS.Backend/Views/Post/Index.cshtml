@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CMS.Data.Entities.Post>
+@model IEnumerable<CMS.Data.Entities.Post>
 @{
     ViewData["Title"] = "Bài viết";
     Layout = "_LayoutAdmin";
@@ -64,5 +64,34 @@
             </div>
         }
     </div>
+
+@* ───────── PAGINATION ───────── *@
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string baseUrl = categoryName != null ? "/Post/ListByCategory/" + ViewContext.RouteData.Values["id"] : "/Post";
+}
+@if (totalPages > 1)
+{
+    <nav aria-label="Phân trang bài viết">
+        <ul class="pagination justify-content-center mt-4">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@baseUrl?page=@(currentPage - 1)&pageSize=9">‹</a>
+            </li>
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="@baseUrl?page=@i&pageSize=9">@i</a>
+                </li>
+            }
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" href="@baseUrl?page=@(currentPage + 1)&pageSize=9">›</a>
+            </li>
+        </ul>
+        <p class="text-center text-muted small mb-0">
+            Trang @currentPage / @totalPages (tổng số @ViewBag.TotalItems bài viết)
+        </p>
+    </nav>
+}
 
 </div>

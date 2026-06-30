@@ -3,13 +3,19 @@ import { useNavigate, Link } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import customerService from '../../services/customerService';
+import ForgotPasswordModal from '../../components/ForgotPasswordModal';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
   const navigate = useNavigate();
+
+  const handleForgotPasswordSubmit = async (forgotEmail) => {
+    await customerService.forgotPassword(forgotEmail);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -57,10 +63,20 @@ function Login() {
             </div>
 
             <div className="mb-4">
-              <label className="form-label small fw-semibold text-secondary">Mật khẩu</label>
+              <div className="d-flex justify-content-between align-items-center">
+                <label className="form-label small fw-semibold text-secondary mb-0">Mật khẩu</label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgot(true)}
+                  className="btn btn-link p-0 text-muted small text-decoration-none"
+                  style={{ fontSize: '0.82rem' }}
+                >
+                  Quên mật khẩu?
+                </button>
+              </div>
               <input
                 type="password"
-                className="form-control"
+                className="form-control mt-1"
                 placeholder="Nhập mật khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -82,6 +98,12 @@ function Login() {
             Chưa có tài khoản? <Link to="/register" className="text-dark fw-bold text-decoration-none">Đăng ký ngay</Link>
           </p>
         </div>
+
+        <ForgotPasswordModal
+          show={showForgot}
+          onClose={() => setShowForgot(false)}
+          onSubmit={handleForgotPasswordSubmit}
+        />
       </div>
       <Footer />
     </div>
